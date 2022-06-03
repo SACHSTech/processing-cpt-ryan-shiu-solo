@@ -9,7 +9,12 @@ public class Sketch extends PApplet {
   float kirbyFallingX = 0;
   float kirbyFallingY = 0; 
   boolean boolKirbySpawn = false;
+  boolean boolLevel1 = false;
 
+  float[] circleX = new float[15];
+  float[] circleY = new float[15];
+
+  
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -29,11 +34,13 @@ public class Sketch extends PApplet {
     imgKirbyEating = loadImage("Kirby_eating.png");
 
     imgKirbyFalling.resize(imgKirbyFalling.width/5, imgKirbyFalling.height/5);
-    imgKirbyEating.resize(imgKirbyEating.width/10, imgKirbyEating.height/10);
+    imgKirbyEating.resize(imgKirbyEating.width/5, imgKirbyEating.height/5);
 
-
-    System.out.println(imgKirbyEating.width);
-    System.out.println(imgKirbyEating.height);
+    for(int i = 0; i < circleY.length; i++){
+      circleX[i] = random(width);
+      circleY[i] = random(height);
+      System.out.println(circleX[i] + " " + circleY[i]);
+    }
   }
 
   /**
@@ -41,6 +48,16 @@ public class Sketch extends PApplet {
    */
   public void draw() {
     background(0);
+
+    for(int i = 0; i < circleY.length; i++){
+      ellipse(circleX[i], circleY[i], 50 ,50);
+      circleY[i]+=2;
+      System.out.println("falling");
+
+      if(circleY[i] > 550){
+        circleY[i] = 0;
+      }
+    }
 
     kirbyFallingX += 3;
     kirbyFallingY += 3;
@@ -61,16 +78,19 @@ public class Sketch extends PApplet {
       }
     }
     
-    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY <= playerY){
-      System.out.println("It worked");
+    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480){
+      //System.out.println("It worked");
       boolKirbySpawn = true;
     }
 
     if(boolKirbySpawn == true){
-      System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
-      image(imgKirbyEating, playerX + 50, playerY - 25);
-
+      //System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
+      image(imgKirbyEating, playerX + 13, playerY - 55);
+      kirbyFallingX += 700;
+      kirbyFallingY += 700;
     }
+
+    if(playerX )
 
     rect(playerX, playerY, 100, 25);
     image(imgKirbyFalling, kirbyFallingX, kirbyFallingY);
