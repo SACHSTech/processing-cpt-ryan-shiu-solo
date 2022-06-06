@@ -8,6 +8,7 @@ public class Sketch extends PApplet {
   float playerY = 500;
   float kirbyFallingX = 0;
   float kirbyFallingY = 0; 
+  int intScore = 0;
   boolean boolKirbySpawn = false;
   boolean boolLevel1 = false;
 
@@ -49,11 +50,13 @@ public class Sketch extends PApplet {
   public void draw() {
     background(0);
 
+    // Falling circles
     for(int i = 0; i < circleY.length; i++){
       ellipse(circleX[i], circleY[i], 50 ,50);
       circleY[i]+=2;
-      System.out.println("falling");
+      //System.out.println("falling");
 
+      // Respawing circles back at the top once it is out of frame
       if(circleY[i] > 550){
         circleY[i] = 0;
       }
@@ -62,6 +65,7 @@ public class Sketch extends PApplet {
     kirbyFallingX += 3;
     kirbyFallingY += 3;
 	  
+    // Moving Kirby and block according to the key that is pressed
     if(keyPressed){
       if(keyCode == RIGHT){
         playerX+= 5;
@@ -78,7 +82,7 @@ public class Sketch extends PApplet {
       }
     }
     
-    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480){
+    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480 && boolKirbySpawn == false){
       //System.out.println("It worked");
       boolKirbySpawn = true;
     }
@@ -90,10 +94,29 @@ public class Sketch extends PApplet {
       kirbyFallingY += 700;
     }
 
-    if(playerX )
+    else if(kirbyFallingY == 525){
+      kirbyFallingX = 0;
+      kirbyFallingY = 0;
 
+    }
+
+    for(int count = 0; count < circleY.length; count++){
+      if(circleY[count] > playerY && circleX[count] > playerX && circleX[count] < playerX + 100 && boolKirbySpawn == true){
+        System.out.println("Hit!");
+        circleY[count] = 0;
+        circleX[count] = random(width);
+        intScore++;
+
+      }
+    }
+
+    fill(230, 152, 9);
     rect(playerX, playerY, 100, 25);
     image(imgKirbyFalling, kirbyFallingX, kirbyFallingY);
+
+    textSize(40);
+    fill(255, 255, 255);
+    text(intScore, 550, 100);
   }
   
   // define other methods down here.
