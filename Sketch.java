@@ -8,12 +8,16 @@ public class Sketch extends PApplet {
   float playerY = 500;
   float kirbyFallingX = 0;
   float kirbyFallingY = 0; 
+  int intLives = 3;
   int intScore = 0;
   boolean boolKirbySpawn = false;
   boolean boolLevel1 = false;
 
-  float[] circleX = new float[15];
-  float[] circleY = new float[15];
+  float[] circleX = new float[7];
+  float[] circleY = new float[7];
+
+  float[] badcircleX = new float[3];
+  float[] badcircleY = new float[3];
 
   
 	
@@ -35,12 +39,17 @@ public class Sketch extends PApplet {
     imgKirbyEating = loadImage("Kirby_eating.png");
 
     imgKirbyFalling.resize(imgKirbyFalling.width/5, imgKirbyFalling.height/5);
-    imgKirbyEating.resize(imgKirbyEating.width/5, imgKirbyEating.height/5);
+    imgKirbyEating.resize(imgKirbyEating.width/7, imgKirbyEating.height/7);
 
     for(int i = 0; i < circleY.length; i++){
       circleX[i] = random(width);
       circleY[i] = random(height);
       System.out.println(circleX[i] + " " + circleY[i]);
+    }
+
+    for(int i = 0; i < badcircleY.length; i++){
+      badcircleX[i] = random(width);
+      badcircleY[i] = random(height);
     }
   }
 
@@ -50,7 +59,7 @@ public class Sketch extends PApplet {
   public void draw() {
     background(0);
 
-    // Falling circles
+    // Falling white circles
     for(int i = 0; i < circleY.length; i++){
       ellipse(circleX[i], circleY[i], 50 ,50);
       circleY[i]+=2;
@@ -62,16 +71,30 @@ public class Sketch extends PApplet {
       }
     }
 
+    // Spawining bad circles
+    for(int i = 0; i < badcircleY.length; i++){
+      fill(255, 0, 0);
+      ellipse(badcircleX[i], badcircleY[i], 50, 50);
+      badcircleY[i]+=5;
+
+      // Once the bad circle reaches 700, it respawns back to the top at a random width
+      if(badcircleY[i] > 550){
+        badcircleY[i] = 0;
+        badcircleX[i] = random(width);
+      }
+    }
+
+
     kirbyFallingX += 3;
     kirbyFallingY += 3;
 	  
     // Moving Kirby and block according to the key that is pressed
     if(keyPressed){
       if(keyCode == RIGHT){
-        playerX+= 5;
+        playerX+= 10;
       }
       else if(keyCode == LEFT){
-        playerX-= 5;
+        playerX-= 10;
       }
       
       if(playerX >= 600){
@@ -82,31 +105,44 @@ public class Sketch extends PApplet {
       }
     }
     
+    // When kirby hits the rectangle, boolKirbySpawn is true
     if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480 && boolKirbySpawn == false){
       //System.out.println("It worked");
       boolKirbySpawn = true;
     }
 
+    // Kirby spawns on the rectangle
     if(boolKirbySpawn == true){
       //System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
-      image(imgKirbyEating, playerX + 13, playerY - 55);
+      image(imgKirbyEating, playerX + 18, playerY - 42);
       kirbyFallingX += 700;
       kirbyFallingY += 700;
     }
 
+    // If the user misses kirby, he respawns back at the top
     else if(kirbyFallingY == 525){
       kirbyFallingX = 0;
       kirbyFallingY = 0;
 
     }
 
+    // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
     for(int count = 0; count < circleY.length; count++){
       if(circleY[count] > playerY && circleX[count] > playerX && circleX[count] < playerX + 100 && boolKirbySpawn == true){
         System.out.println("Hit!");
         circleY[count] = 0;
         circleX[count] = random(width);
-        intScore++;
+        intScore++; 
 
+      }
+    }
+
+    // When the player collides with a red circle, the player looses a life
+    for(int count = 0; count < badcircleY.length; count++){
+      if(badcircleY[count] > playerY && badcircleX[count] > playerX && badcircleX[count] < playerX + 100 && boolKirbySpawn == true){
+        badcircleY[count] = 0;
+        badcircleX[count] = random(width);
+        intScore += 100;
       }
     }
 
