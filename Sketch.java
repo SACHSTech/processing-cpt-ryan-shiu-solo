@@ -4,12 +4,23 @@ import processing.core.PImage;
 public class Sketch extends PApplet {
 	PImage imgKirbyFalling;
   PImage imgKirbyEating;
+  PImage imgLives;
+
   float playerX = 350;
   float playerY = 500;
   float kirbyFallingX = 0;
   float kirbyFallingY = 0; 
+  float lives1X = 625;
+  float lives1Y = 0;
+  float lives2X = 575;
+  float lives2Y = 0;
+  float lives3X = 525;
+  float lives3Y = 0;
+
   int intLives = 3;
   int intScore = 0;
+
+  boolean boolPlayerAlive = false;
   boolean boolKirbySpawn = false;
   boolean boolLevel1 = false;
 
@@ -37,9 +48,13 @@ public class Sketch extends PApplet {
     background(0);
     imgKirbyFalling = loadImage("kirby_falling.png");
     imgKirbyEating = loadImage("Kirby_eating.png");
+    imgLives = loadImage("pixel_heart.png");
 
     imgKirbyFalling.resize(imgKirbyFalling.width/5, imgKirbyFalling.height/5);
     imgKirbyEating.resize(imgKirbyEating.width/7, imgKirbyEating.height/7);
+    imgLives.resize(imgLives.width/30, imgLives.height/30);
+    System.out.println(imgLives.width + imgLives.height);
+
 
     for(int i = 0; i < circleY.length; i++){
       circleX[i] = random(width);
@@ -89,30 +104,31 @@ public class Sketch extends PApplet {
     kirbyFallingY += 3;
 	  
     // Moving Kirby and block according to the key that is pressed
-    if(keyPressed){
-      if(keyCode == RIGHT){
-        playerX+= 10;
+      if(keyPressed){
+        if(keyCode == RIGHT){
+          playerX+= 10;
+        }
+        else if(keyCode == LEFT){
+          playerX-= 10;
+        }
+        
+        if(playerX >= 600){
+          playerX = 600;
+        }
+        else if(playerX <= 0){
+          playerX = 0;
+        }
       }
-      else if(keyCode == LEFT){
-        playerX-= 10;
-      }
-      
-      if(playerX >= 600){
-        playerX = 600;
-      }
-      else if(playerX <= 0){
-        playerX = 0;
-      }
-    }
     
     // When kirby hits the rectangle, boolKirbySpawn is true
-    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480 && boolKirbySpawn == false){
+    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480 && boolKirbySpawn == false && boolPlayerAlive == false){
       //System.out.println("It worked");
       boolKirbySpawn = true;
+      boolPlayerAlive = true;
     }
 
     // Kirby spawns on the rectangle
-    if(boolKirbySpawn == true){
+    if(boolKirbySpawn == true && boolPlayerAlive == true){
       //System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
       image(imgKirbyEating, playerX + 18, playerY - 42);
       kirbyFallingX += 700;
@@ -128,7 +144,7 @@ public class Sketch extends PApplet {
 
     // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
     for(int count = 0; count < circleY.length; count++){
-      if(circleY[count] > playerY && circleX[count] > playerX && circleX[count] < playerX + 100 && boolKirbySpawn == true){
+      if(circleY[count] > playerY && circleX[count] > playerX && circleX[count] < playerX + 100 && boolKirbySpawn == true && boolPlayerAlive == true){
         System.out.println("Hit!");
         circleY[count] = 0;
         circleX[count] = random(width);
@@ -139,12 +155,34 @@ public class Sketch extends PApplet {
 
     // When the player collides with a red circle, the player looses a life
     for(int count = 0; count < badcircleY.length; count++){
-      if(badcircleY[count] > playerY && badcircleX[count] > playerX && badcircleX[count] < playerX + 100 && boolKirbySpawn == true){
+      if(badcircleY[count] > playerY && badcircleX[count] > playerX && badcircleX[count] < playerX + 100 && boolKirbySpawn == true && boolPlayerAlive == true){
         badcircleY[count] = 0;
         badcircleX[count] = random(width);
-        intScore += 100;
+        intLives--;
       }
     }
+
+    if(intLives == 0){
+      boolPlayerAlive = false;
+      fill(0);
+
+    }
+
+    else if(intLives == 2){
+      lives3X = 1000;
+      lives3Y = 1000;
+    }
+    
+    else if(intLives == 1){
+      lives2X = 1000;
+      lives2Y = 1000;
+    }
+    
+    
+    image(imgLives, lives1X, lives1Y);
+    image(imgLives, lives2X, lives2Y);
+    image(imgLives, lives3X, lives3Y);
+
 
     fill(230, 152, 9);
     rect(playerX, playerY, 100, 25);
