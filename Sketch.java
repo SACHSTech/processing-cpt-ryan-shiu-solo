@@ -6,23 +6,25 @@ public class Sketch extends PApplet {
   PImage imgKirbyEating;
   PImage imgLives;
 
-  float playerX = 350;
-  float playerY = 500;
-  float kirbyFallingX = 0;
-  float kirbyFallingY = 0; 
-  float lives1X = 625;
-  float lives1Y = 0;
-  float lives2X = 575;
-  float lives2Y = 0;
-  float lives3X = 525;
-  float lives3Y = 0;
+  float fltplayerX = 350;
+  float fltplayerY = 500;
+  float fltkirbyFallingX = 0;
+  float fltkirbyFallingY = 0; 
+  float fltlives1X = 625;
+  float fltlives1Y = 0;
+  float fltlives2X = 575;
+  float fltlives2Y = 0;
+  float fltlives3X = 525;
+  float fltlives3Y = 0;
+  float fltbadcircleYMovement = 5;
 
   int intLives = 3;
   int intScore = 0;
 
-  boolean boolPlayerAlive = false;
-  boolean boolKirbySpawn = false;
-  boolean boolLevel1 = false;
+  boolean blnPlayerAlive = false;
+  boolean blnKirbySpawn = false;
+  boolean blnLevel1 = false;
+  boolean blnStopSpeed = false;
 
   float[] circleX = new float[7];
   float[] circleY = new float[7];
@@ -90,7 +92,13 @@ public class Sketch extends PApplet {
     for(int i = 0; i < badcircleY.length; i++){
       fill(255, 0, 0);
       ellipse(badcircleX[i], badcircleY[i], 50, 50);
-      badcircleY[i]+=5;
+      badcircleY[i]+= fltbadcircleYMovement;
+      System.out.println(fltbadcircleYMovement);
+
+      if(intScore % 2 == 0 && blnStopSpeed == false){
+        fltbadcircleYMovement += 5;
+        blnStopSpeed = true;
+      }
 
       // Once the bad circle reaches 700, it respawns back to the top at a random width
       if(badcircleY[i] > 550){
@@ -100,52 +108,52 @@ public class Sketch extends PApplet {
     }
 
 
-    kirbyFallingX += 3;
-    kirbyFallingY += 3;
+    fltkirbyFallingX += 3;
+    fltkirbyFallingY += 3;
 	  
     // Moving Kirby and block according to the key that is pressed
       if(keyPressed){
         if(keyCode == RIGHT){
-          playerX+= 10;
+          fltplayerX+= 10;
         }
         else if(keyCode == LEFT){
-          playerX-= 10;
+          fltplayerX-= 10;
         }
         
-        if(playerX >= 600){
-          playerX = 600;
+        if(fltplayerX >= 600){
+          fltplayerX = 600;
         }
-        else if(playerX <= 0){
-          playerX = 0;
+        else if(fltplayerX <= 0){
+          fltplayerX = 0;
         }
       }
     
     // When kirby hits the rectangle, boolKirbySpawn is true
-    if(kirbyFallingX > playerX && kirbyFallingX < playerX + 100 && kirbyFallingY >= 480 && boolKirbySpawn == false && boolPlayerAlive == false){
+    if(fltkirbyFallingX > fltplayerX && fltkirbyFallingX < fltplayerX + 100 && fltkirbyFallingY >= 480 && blnKirbySpawn == false && blnPlayerAlive == false){
       //System.out.println("It worked");
-      boolKirbySpawn = true;
-      boolPlayerAlive = true;
+      blnKirbySpawn = true;
+      blnPlayerAlive = true;
     }
 
     // Kirby spawns on the rectangle
-    if(boolKirbySpawn == true && boolPlayerAlive == true){
+    if(blnKirbySpawn == true && blnPlayerAlive == true){
       //System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
-      image(imgKirbyEating, playerX + 18, playerY - 42);
-      kirbyFallingX += 700;
-      kirbyFallingY += 700;
+      image(imgKirbyEating, fltplayerX + 18, fltplayerY - 42);
+      fltkirbyFallingX += 700;
+      fltkirbyFallingY += 700;
     }
 
     // If the user misses kirby, he respawns back at the top
-    else if(kirbyFallingY == 525){
-      kirbyFallingX = 0;
-      kirbyFallingY = 0;
+    else if(fltkirbyFallingY == 525){
+      fltkirbyFallingX = 0;
+      fltkirbyFallingY = 0;
 
     }
 
     // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
     for(int count = 0; count < circleY.length; count++){
-      if(circleY[count] > playerY && circleX[count] > playerX && circleX[count] < playerX + 100 && boolKirbySpawn == true && boolPlayerAlive == true){
-        System.out.println("Hit!");
+      if(circleY[count] > fltplayerY && circleX[count] > fltplayerX && circleX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
+       // System.out.println("Hit!");
         circleY[count] = 0;
         circleX[count] = random(width);
         intScore++; 
@@ -155,7 +163,7 @@ public class Sketch extends PApplet {
 
     // When the player collides with a red circle, the player looses a life
     for(int count = 0; count < badcircleY.length; count++){
-      if(badcircleY[count] > playerY && badcircleX[count] > playerX && badcircleX[count] < playerX + 100 && boolKirbySpawn == true && boolPlayerAlive == true){
+      if(badcircleY[count] > fltplayerY && badcircleX[count] > fltplayerX && badcircleX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
         badcircleY[count] = 0;
         badcircleX[count] = random(width);
         intLives--;
@@ -163,30 +171,31 @@ public class Sketch extends PApplet {
     }
 
     if(intLives == 0){
-      boolPlayerAlive = false;
+      blnPlayerAlive = false;
       fill(0);
 
     }
 
     else if(intLives == 2){
-      lives3X = 1000;
-      lives3Y = 1000;
+      fltlives3X = 1000;
+      fltlives3Y = 1000;
     }
     
     else if(intLives == 1){
-      lives2X = 1000;
-      lives2Y = 1000;
+      fltlives2X = 1000;
+      fltlives2Y = 1000;
     }
+
     
     
-    image(imgLives, lives1X, lives1Y);
-    image(imgLives, lives2X, lives2Y);
-    image(imgLives, lives3X, lives3Y);
+    image(imgLives, fltlives1X, fltlives1Y);
+    image(imgLives, fltlives2X, fltlives2Y);
+    image(imgLives, fltlives3X, fltlives3Y);
 
 
     fill(230, 152, 9);
-    rect(playerX, playerY, 100, 25);
-    image(imgKirbyFalling, kirbyFallingX, kirbyFallingY);
+    rect(fltplayerX, fltplayerY, 100, 25);
+    image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
 
     textSize(40);
     fill(255, 255, 255);
@@ -194,4 +203,5 @@ public class Sketch extends PApplet {
   }
   
   // define other methods down here.
+
 }
