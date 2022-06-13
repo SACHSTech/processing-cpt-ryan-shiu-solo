@@ -5,6 +5,11 @@ public class Sketch extends PApplet {
 	PImage imgKirbyFalling;
   PImage imgKirbyEating;
   PImage imgLives;
+  PImage imgCandy;
+  PImage imgBackground0;
+  PImage imgBackground1;
+  PImage imgBackground2;
+  PImage imgGameOver;
 
   float fltplayerX = 350;
   float fltplayerY = 500;
@@ -20,17 +25,20 @@ public class Sketch extends PApplet {
 
   int intLives = 3;
   int intScore = 0;
+  int intSpeedBoostScore = 20;
 
   boolean blnPlayerAlive = false;
   boolean blnKirbySpawn = false;
   boolean blnLevel1 = false;
-  boolean blnStopSpeed = false;
+  boolean blnStopSpeed = true;
 
-  float[] circleX = new float[7];
-  float[] circleY = new float[7];
+  float[] candyX = new float[7];
+  float[] candyY = new float[7];
 
   float[] badcircleX = new float[3];
   float[] badcircleY = new float[3];
+
+  PImage[] backgrounds = new PImage[3];
 
   
 	
@@ -51,17 +59,31 @@ public class Sketch extends PApplet {
     imgKirbyFalling = loadImage("kirby_falling.png");
     imgKirbyEating = loadImage("Kirby_eating.png");
     imgLives = loadImage("pixel_heart.png");
+    imgCandy = loadImage("Candy.png");
+    imgBackground0 = loadImage("background0.jpeg");
+    imgBackground1 = loadImage("background1.jpg");
+    imgBackground2 = loadImage("background2.jpeg");
+    imgGameOver = loadImage("game_over.jpeg");
 
     imgKirbyFalling.resize(imgKirbyFalling.width/5, imgKirbyFalling.height/5);
     imgKirbyEating.resize(imgKirbyEating.width/7, imgKirbyEating.height/7);
     imgLives.resize(imgLives.width/30, imgLives.height/30);
-    System.out.println(imgLives.width + imgLives.height);
+    imgCandy.resize(imgCandy.width = 50, imgCandy.height = 50);
+    imgBackground0.resize(imgBackground0.width = 700, imgBackground0.height = 550);
+    imgBackground1.resize(imgBackground1.width = 700, imgBackground1.height = 550);
+    imgBackground2.resize(imgBackground2.width = 700, imgBackground2.height = 550);
+    imgGameOver.resize(imgGameOver.width = 700, imgGameOver.height = 550);
+    System.out.println(imgCandy.width + " " + imgCandy.height);
+
+    backgrounds[0] = imgBackground0;
+    backgrounds[1] = imgBackground1;
+    backgrounds[2] = imgBackground2;
 
 
-    for(int i = 0; i < circleY.length; i++){
-      circleX[i] = random(width);
-      circleY[i] = random(height);
-      System.out.println(circleX[i] + " " + circleY[i]);
+    for(int i = 0; i < candyY.length; i++){
+      candyX[i] = random(width);
+      candyY[i] = random(height);
+      //System.out.println(circleX[i] + " " + circleY[i]);
     }
 
     for(int i = 0; i < badcircleY.length; i++){
@@ -74,17 +96,25 @@ public class Sketch extends PApplet {
    * Called repeatedly, anything drawn to the screen goes here
    */
   public void draw() {
-    background(0);
+    if(intLives == 3){
+      background(backgrounds[0]);
+    }
+    else if(intLives == 2){
+      background(backgrounds[1]);
+    }
+    else{
+      background(backgrounds[2]);
+    }
 
     // Falling white circles
-    for(int i = 0; i < circleY.length; i++){
-      ellipse(circleX[i], circleY[i], 50 ,50);
-      circleY[i]+=2;
+    for(int i = 0; i < candyY.length; i++){
+      image(imgCandy, candyX[i], candyY[i]);
+      candyY[i]+=2;
       //System.out.println("falling");
 
       // Respawing circles back at the top once it is out of frame
-      if(circleY[i] > 550){
-        circleY[i] = 0;
+      if(candyY[i] > 550){
+        candyY[i] = 0;
       }
     }
 
@@ -93,11 +123,16 @@ public class Sketch extends PApplet {
       fill(255, 0, 0);
       ellipse(badcircleX[i], badcircleY[i], 50, 50);
       badcircleY[i]+= fltbadcircleYMovement;
-      System.out.println(fltbadcircleYMovement);
+      //System.out.println(fltbadcircleYMovement);
 
-      if(intScore % 2 == 0 && blnStopSpeed == false){
+      if(intScore == 1){
+        blnStopSpeed = false;
+      }
+
+      if(intScore % intSpeedBoostScore == 0 && blnStopSpeed == false){
         fltbadcircleYMovement += 5;
         blnStopSpeed = true;
+        //System.out.println(fltbadcircleYMovement);
       }
 
       // Once the bad circle reaches 700, it respawns back to the top at a random width
@@ -151,11 +186,11 @@ public class Sketch extends PApplet {
     }
 
     // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
-    for(int count = 0; count < circleY.length; count++){
-      if(circleY[count] > fltplayerY && circleX[count] > fltplayerX && circleX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
-       // System.out.println("Hit!");
-        circleY[count] = 0;
-        circleX[count] = random(width);
+    for(int count = 0; count < candyY.length; count++){
+      if(candyY[count] >= fltplayerY - 25 && candyX[count] > fltplayerX - 30 && candyX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
+        System.out.println("Hit!");
+        candyY[count] = 0;
+        candyX[count] = random(width);
         intScore++; 
 
       }
@@ -170,9 +205,34 @@ public class Sketch extends PApplet {
       }
     }
 
+    if(intScore == 5){
+      mustHit(intScore);
+
+    }
+
+    image(imgLives, fltlives1X, fltlives1Y);
+    image(imgLives, fltlives2X, fltlives2Y);
+    image(imgLives, fltlives3X, fltlives3Y);
+
+    textSize(40);
+    fill(255, 255, 255);
+    text(intScore, 550, 100);
+
+
+    fill(230, 152, 9);
+    rect(fltplayerX, fltplayerY, 100, 25);
+    image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
+
     if(intLives == 0){
       blnPlayerAlive = false;
       fill(0);
+      fltlives1X = 1000;
+      fltlives1X = 1000;
+      fill(0);
+      image(imgGameOver, 0, 0);
+      textSize(40);
+      fill(255, 255, 255);
+      text("Final Score: " + intScore, 170, 100);
 
     }
 
@@ -185,23 +245,14 @@ public class Sketch extends PApplet {
       fltlives2X = 1000;
       fltlives2Y = 1000;
     }
-
-    
-    
-    image(imgLives, fltlives1X, fltlives1Y);
-    image(imgLives, fltlives2X, fltlives2Y);
-    image(imgLives, fltlives3X, fltlives3Y);
-
-
-    fill(230, 152, 9);
-    rect(fltplayerX, fltplayerY, 100, 25);
-    image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
-
-    textSize(40);
-    fill(255, 255, 255);
-    text(intScore, 550, 100);
   }
   
   // define other methods down here.
 
+  public int mustHit(int intScore){
+    intScore += 5;
+    System.out.println(intScore);
+    return intScore;
+
+  }
 }
