@@ -1,3 +1,8 @@
+/**
+ * A program @Sketch.java where the user must controll where kirby is in order to gain points and avoid losing lives
+ * @author: R. Shiu
+ */
+
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -10,6 +15,8 @@ public class Sketch extends PApplet {
   PImage imgBackground1;
   PImage imgBackground2;
   PImage imgGameOver;
+  PImage imgPlayAgain;
+  PImage imgCoin;
 
   float fltplayerX = 350;
   float fltplayerY = 500;
@@ -22,10 +29,13 @@ public class Sketch extends PApplet {
   float fltlives3X = 525;
   float fltlives3Y = 0;
   float fltbadcircleYMovement = 5;
+  float fltMustHitY = 0;
 
   int intLives = 3;
   int intScore = 0;
   int intSpeedBoostScore = 20;
+  int intPlayAgainX = 280;
+  int intPlayAgainY = 425;
 
   boolean blnPlayerAlive = false;
   boolean blnKirbySpawn = false;
@@ -38,7 +48,11 @@ public class Sketch extends PApplet {
   float[] badcircleX = new float[3];
   float[] badcircleY = new float[3];
 
+  float[] mustHitX = new float[1];
+  float[] mustHitY = new float[1];
+
   PImage[] backgrounds = new PImage[3];
+
 
   
 	
@@ -64,15 +78,19 @@ public class Sketch extends PApplet {
     imgBackground1 = loadImage("background1.jpg");
     imgBackground2 = loadImage("background2.jpeg");
     imgGameOver = loadImage("game_over.jpeg");
+    imgPlayAgain = loadImage("play_again.png");
+    imgCoin = loadImage("coin.png");
 
     imgKirbyFalling.resize(imgKirbyFalling.width/5, imgKirbyFalling.height/5);
     imgKirbyEating.resize(imgKirbyEating.width/7, imgKirbyEating.height/7);
     imgLives.resize(imgLives.width/30, imgLives.height/30);
     imgCandy.resize(imgCandy.width = 50, imgCandy.height = 50);
+    imgCoin.resize(imgCoin.width = 50, imgCoin.height = 50);
     imgBackground0.resize(imgBackground0.width = 700, imgBackground0.height = 550);
     imgBackground1.resize(imgBackground1.width = 700, imgBackground1.height = 550);
     imgBackground2.resize(imgBackground2.width = 700, imgBackground2.height = 550);
     imgGameOver.resize(imgGameOver.width = 700, imgGameOver.height = 550);
+    imgPlayAgain.resize(imgPlayAgain.width = 175, imgPlayAgain.height = 75);
     System.out.println(imgCandy.width + " " + imgCandy.height);
 
     backgrounds[0] = imgBackground0;
@@ -89,6 +107,11 @@ public class Sketch extends PApplet {
     for(int i = 0; i < badcircleY.length; i++){
       badcircleX[i] = random(width);
       badcircleY[i] = random(height);
+    }
+
+    for(int i = 0; i < mustHitY.length; i++){
+      mustHitX[i] = random(width);
+      mustHitY[i] = 0;
     }
   }
 
@@ -129,7 +152,7 @@ public class Sketch extends PApplet {
         blnStopSpeed = false;
       }
 
-      if(intScore % intSpeedBoostScore == 0 && blnStopSpeed == false){
+      if(intScore ==  intSpeedBoostScore && blnStopSpeed == false){
         fltbadcircleYMovement += 5;
         blnStopSpeed = true;
         //System.out.println(fltbadcircleYMovement);
@@ -188,7 +211,7 @@ public class Sketch extends PApplet {
     // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
     for(int count = 0; count < candyY.length; count++){
       if(candyY[count] >= fltplayerY - 25 && candyX[count] > fltplayerX - 30 && candyX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
-        System.out.println("Hit!");
+       // System.out.println("Hit!");
         candyY[count] = 0;
         candyX[count] = random(width);
         intScore++; 
@@ -205,14 +228,21 @@ public class Sketch extends PApplet {
       }
     }
 
-    if(intScore == 5){
-      mustHit(intScore);
+    if(intScore > 5){
+      for(int i = 0; i < 1; i++){
+        image(imgCoin, mustHitY[i], mustHitY[i]);
+        mustHitY[i]+= 3;
+        System.out.println(fltMustHitY);
+      }
+      //intScore = mustHit(intScore);
 
     }
 
-    image(imgLives, fltlives1X, fltlives1Y);
-    image(imgLives, fltlives2X, fltlives2Y);
-    image(imgLives, fltlives3X, fltlives3Y);
+    if(intLives == 3){
+      image(imgLives, fltlives1X, fltlives1Y);
+      image(imgLives, fltlives2X, fltlives2Y);
+      image(imgLives, fltlives3X, fltlives3Y);
+    }
 
     textSize(40);
     fill(255, 255, 255);
@@ -232,27 +262,58 @@ public class Sketch extends PApplet {
       image(imgGameOver, 0, 0);
       textSize(40);
       fill(255, 255, 255);
-      text("Final Score: " + intScore, 170, 100);
+      text("Final Score: " + intScore, 223, 100);
+      image(imgPlayAgain, intPlayAgainX, intPlayAgainY);
+      // 175, 75
+
+
 
     }
 
     else if(intLives == 2){
       fltlives3X = 1000;
       fltlives3Y = 1000;
+      image(imgLives, fltlives1X, fltlives1Y);
+      image(imgLives, fltlives2X, fltlives2Y);
+      image(imgLives, fltlives3X, fltlives3Y);
     }
     
     else if(intLives == 1){
       fltlives2X = 1000;
       fltlives2Y = 1000;
+      image(imgLives, fltlives1X, fltlives1Y);
+      image(imgLives, fltlives2X, fltlives2Y);
+      image(imgLives, fltlives3X, fltlives3Y);
     }
+
+    //System.out.println(intLives);
   }
-  
+
   // define other methods down here.
 
   public int mustHit(int intScore){
     intScore += 5;
-    System.out.println(intScore);
     return intScore;
 
+  }
+
+  public void mouseClicked(){
+    if(intLives == 0){
+      if(mouseX < intPlayAgainX + 175 && mouseX > intPlayAgainX && mouseY < intPlayAgainY + 75 && mouseY > intPlayAgainY){
+        System.out.println("PRESSED");
+        blnPlayerAlive = true;
+        blnKirbySpawn = true;
+        intScore = 0;
+        intLives = 3;
+        fltlives1X = 625;
+        fltlives1Y = 0;
+        fltlives2X = 575;
+        fltlives2Y = 0;
+        fltlives3X = 525;
+        fltlives3Y = 0;
+        fltbadcircleYMovement -= 5;
+      }
+
+    }
   }
 }
