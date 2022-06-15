@@ -5,6 +5,7 @@
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import java.util.ArrayList; 
 
 public class Sketch extends PApplet {
 	PImage imgKirbyFalling;
@@ -38,6 +39,9 @@ public class Sketch extends PApplet {
   int intSpeedBoostScore = 20;
   int intPlayAgainX = 280;
   int intPlayAgainY = 425;
+  int intHighScore1 = 0;
+  int intHighScore2 = 0;
+  int intHighScore3 = 0;
 
   boolean blnPlayerAlive = false;
   boolean blnKirbySpawn = false;
@@ -55,8 +59,8 @@ public class Sketch extends PApplet {
 
   PImage[] backgrounds = new PImage[3];
 
+  ArrayList<Integer> intHighScore = new ArrayList<Integer>();
 
-  
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -115,6 +119,10 @@ public class Sketch extends PApplet {
       mustHitX[i] = random(width);
       mustHitY[i] = 0;
     }
+
+    intHighScore.add(0, intHighScore1);
+    intHighScore.add(1, intHighScore2);
+    intHighScore.add(2, intHighScore3);
   }
 
   /**
@@ -154,7 +162,7 @@ public class Sketch extends PApplet {
         blnStopSpeed = false;
       }
 
-      if(intScore ==  intSpeedBoostScore && blnStopSpeed == false){
+      if(intScore >  intSpeedBoostScore && blnStopSpeed == false){
         fltbadcircleYMovement += 5;
         blnStopSpeed = true;
         //System.out.println(fltbadcircleYMovement);
@@ -231,19 +239,19 @@ public class Sketch extends PApplet {
     }
 
     // Drops Gold Coin 
-    if(intScore > fltMustHitScore - 1){
+    if(intScore > fltMustHitScore && blnKirbySpawn == true && blnPlayerAlive == true){
       for(int count = 0; count < 1; count++){
         image(imgCoin, mustHitX[count], mustHitY[count]);
         mustHitY[count]+= fltMustHitSpeed;
         if(mustHitY[count] > fltplayerY - 25 && mustHitX[count] > fltplayerX && mustHitX[count] < fltplayerX + 100){
           intScore = mustHit(intScore);
           fltMustHitScore += 10;
-          System.out.println("HIT");
+          //System.out.println("HIT");
           mustHitX[count] = random(width);
           mustHitY[count] = 0;
           fltMustHitSpeed++;
         }
-        else if(mustHitY[count] == 550){
+        else if(mustHitY[count] > 550){
           mustHitX[count] = random(width);
           mustHitY[count] = 0;
           intLives--;
@@ -268,6 +276,7 @@ public class Sketch extends PApplet {
     image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
 
     if(intLives == 0){
+
       blnPlayerAlive = false;
       fill(0);
       fltlives1X = 1000;
@@ -278,10 +287,13 @@ public class Sketch extends PApplet {
       fill(255, 255, 255);
       text("Final Score: " + intScore, 223, 100);
       image(imgPlayAgain, intPlayAgainX, intPlayAgainY);
-      // 175, 75
-
-
-
+      textSize(20);
+      text("High Score: " + + intHighScore.get(0), 0, 20);
+      /*
+      text("High Score 2: " + + intHighScore.get(1), 0, 50);
+      System.out.println(intHighScore2);
+      text("High Score 3: " + + intHighScore.get(2), 0, 80);
+      */
     }
 
     else if(intLives == 2){
@@ -300,7 +312,32 @@ public class Sketch extends PApplet {
       image(imgLives, fltlives3X, fltlives3Y);
     }
 
-    System.out.println(intScore);
+
+
+    if(intScore > intHighScore1){
+      intHighScore1 = intScore;
+      intHighScore.set(0, intHighScore1);
+      //System.out.println("Index 1:" + intHighScore.get(0));
+    }
+
+    /*
+    else if(intScore < intHighScore1 && intScore > intHighScore2 && intScore > intHighScore3){
+      intHighScore2 = intScore;
+      //int intHighScore2Difference = intHighScore1 - intHighScore2;
+      //intHighScore2 = intHighScore2 + intHighScore2Difference;
+      System.out.println(intHighScore2);
+      intHighScore.set(1, intHighScore2);
+      System.out.println("Index 2:" + intHighScore.get(1));
+    }
+
+    else if(intScore > intHighScore3 && intScore < intHighScore1 && intScore < intHighScore3){
+      intHighScore3 = intScore;
+      intHighScore.add(2, intScore);
+      System.out.println("Index 3:" + intHighScore.get(3));
+    }
+    */
+
+    //System.out.println(intScore);
   }
 
   // define other methods down here.
@@ -329,6 +366,7 @@ public class Sketch extends PApplet {
         fltkirbyFallingX = 0;
         fltkirbyFallingY = 0;
         fltMustHitScore = 10;
+        fltMustHitSpeed = 1;
         //blnStopSpeed = false;
       }
 
