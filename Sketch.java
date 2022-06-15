@@ -30,6 +30,8 @@ public class Sketch extends PApplet {
   float fltlives3Y = 0;
   float fltbadcircleYMovement = 5;
   float fltMustHitY = 0;
+  float fltMustHitScore = 10;
+  float fltMustHitSpeed = 1;
 
   int intLives = 3;
   int intScore = 0;
@@ -228,13 +230,25 @@ public class Sketch extends PApplet {
       }
     }
 
-    if(intScore > 5){
-      for(int i = 0; i < 1; i++){
-        image(imgCoin, mustHitY[i], mustHitY[i]);
-        mustHitY[i]+= 3;
-        System.out.println(fltMustHitY);
+    // Drops Gold Coin 
+    if(intScore > fltMustHitScore - 1){
+      for(int count = 0; count < 1; count++){
+        image(imgCoin, mustHitX[count], mustHitY[count]);
+        mustHitY[count]+= fltMustHitSpeed;
+        if(mustHitY[count] > fltplayerY - 25 && mustHitX[count] > fltplayerX && mustHitX[count] < fltplayerX + 100){
+          intScore = mustHit(intScore);
+          fltMustHitScore += 10;
+          System.out.println("HIT");
+          mustHitX[count] = random(width);
+          mustHitY[count] = 0;
+          fltMustHitSpeed++;
+        }
+        else if(mustHitY[count] == 550){
+          mustHitX[count] = random(width);
+          mustHitY[count] = 0;
+          intLives--;
+        }
       }
-      //intScore = mustHit(intScore);
 
     }
 
@@ -286,7 +300,7 @@ public class Sketch extends PApplet {
       image(imgLives, fltlives3X, fltlives3Y);
     }
 
-    //System.out.println(intLives);
+    System.out.println(intScore);
   }
 
   // define other methods down here.
@@ -301,8 +315,8 @@ public class Sketch extends PApplet {
     if(intLives == 0){
       if(mouseX < intPlayAgainX + 175 && mouseX > intPlayAgainX && mouseY < intPlayAgainY + 75 && mouseY > intPlayAgainY){
         System.out.println("PRESSED");
-        blnPlayerAlive = true;
-        blnKirbySpawn = true;
+        blnPlayerAlive = false;
+        blnKirbySpawn = false;
         intScore = 0;
         intLives = 3;
         fltlives1X = 625;
@@ -311,7 +325,11 @@ public class Sketch extends PApplet {
         fltlives2Y = 0;
         fltlives3X = 525;
         fltlives3Y = 0;
-        fltbadcircleYMovement -= 5;
+        fltbadcircleYMovement = 5;
+        fltkirbyFallingX = 0;
+        fltkirbyFallingY = 0;
+        fltMustHitScore = 10;
+        //blnStopSpeed = false;
       }
 
     }
