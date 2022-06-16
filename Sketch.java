@@ -8,6 +8,7 @@ import processing.core.PImage;
 import java.util.ArrayList; 
 
 public class Sketch extends PApplet {
+  // Creating images
 	PImage imgKirbyFalling;
   PImage imgKirbyEating;
   PImage imgLives;
@@ -19,6 +20,7 @@ public class Sketch extends PApplet {
   PImage imgPlayAgain;
   PImage imgCoin;
 
+  // Declaring all variables
   float fltplayerX = 350;
   float fltplayerY = 500;
   float fltkirbyFallingX = 0;
@@ -31,23 +33,22 @@ public class Sketch extends PApplet {
   float fltlives3Y = 0;
   float fltbadcircleYMovement = 5;
   float fltMustHitY = 0;
-  float fltMustHitScore = 10;
   float fltMustHitSpeed = 1;
 
   int intLives = 3;
   int intScore = 0;
+  int intMustHitScore = 14;
   int intSpeedBoostScore = 20;
   int intPlayAgainX = 280;
   int intPlayAgainY = 425;
   int intHighScore1 = 0;
-  int intHighScore2 = 0;
-  int intHighScore3 = 0;
 
   boolean blnPlayerAlive = false;
   boolean blnKirbySpawn = false;
   boolean blnLevel1 = false;
   boolean blnStopSpeed = true;
 
+  // Decaring arrays for falling objects
   float[] candyX = new float[7];
   float[] candyY = new float[7];
 
@@ -59,6 +60,7 @@ public class Sketch extends PApplet {
 
   PImage[] backgrounds = new PImage[3];
 
+  // Declaring an array list to store the high score
   ArrayList<Integer> intHighScore = new ArrayList<Integer>();
 
 	
@@ -75,7 +77,6 @@ public class Sketch extends PApplet {
    * values here i.e background, stroke, fill etc.
    */
   public void setup() {
-    background(0);
     imgKirbyFalling = loadImage("kirby_falling.png");
     imgKirbyEating = loadImage("Kirby_eating.png");
     imgLives = loadImage("pixel_heart.png");
@@ -97,38 +98,39 @@ public class Sketch extends PApplet {
     imgBackground2.resize(imgBackground2.width = 700, imgBackground2.height = 550);
     imgGameOver.resize(imgGameOver.width = 700, imgGameOver.height = 550);
     imgPlayAgain.resize(imgPlayAgain.width = 175, imgPlayAgain.height = 75);
-    System.out.println(imgCandy.width + " " + imgCandy.height);
 
+    // Adding backgrounds to the array
     backgrounds[0] = imgBackground0;
     backgrounds[1] = imgBackground1;
     backgrounds[2] = imgBackground2;
 
-
+    // Setting the candy values
     for(int i = 0; i < candyY.length; i++){
       candyX[i] = random(width);
       candyY[i] = random(height);
-      //System.out.println(circleX[i] + " " + circleY[i]);
     }
 
+    // Setting the bad circle values
     for(int i = 0; i < badcircleY.length; i++){
       badcircleX[i] = random(width);
       badcircleY[i] = random(height);
     }
 
+    // Setting the gold coin values
     for(int i = 0; i < mustHitY.length; i++){
       mustHitX[i] = random(width);
       mustHitY[i] = 0;
     }
 
+    // Adding to the high score
     intHighScore.add(0, intHighScore1);
-    intHighScore.add(1, intHighScore2);
-    intHighScore.add(2, intHighScore3);
   }
 
   /**
    * Called repeatedly, anything drawn to the screen goes here
    */
   public void draw() {
+    // The background changes everytime a life is lost
     if(intLives == 3){
       background(backgrounds[0]);
     }
@@ -143,7 +145,6 @@ public class Sketch extends PApplet {
     for(int i = 0; i < candyY.length; i++){
       image(imgCandy, candyX[i], candyY[i]);
       candyY[i]+=2;
-      //System.out.println("falling");
 
       // Respawing circles back at the top once it is out of frame
       if(candyY[i] > 550){
@@ -156,19 +157,19 @@ public class Sketch extends PApplet {
       fill(255, 0, 0);
       ellipse(badcircleX[i], badcircleY[i], 50, 50);
       badcircleY[i]+= fltbadcircleYMovement;
-      //System.out.println(fltbadcircleYMovement);
 
+      
       if(intScore == 1){
         blnStopSpeed = false;
       }
-
+      
+      // Adding 5 speed to the bad circles once the score is over 20
       if(intScore >  intSpeedBoostScore && blnStopSpeed == false){
         fltbadcircleYMovement += 5;
         blnStopSpeed = true;
-        //System.out.println(fltbadcircleYMovement);
       }
 
-      // Once the bad circle reaches 700, it respawns back to the top at a random width
+      // Once the bad circle reaches 550, it respawns back to the top at a random width
       if(badcircleY[i] > 550){
         badcircleY[i] = 0;
         badcircleX[i] = random(width);
@@ -176,9 +177,6 @@ public class Sketch extends PApplet {
     }
 
 
-    fltkirbyFallingX += 3;
-    fltkirbyFallingY += 3;
-	  
     // Moving Kirby and block according to the key that is pressed
       if(keyPressed){
         if(keyCode == RIGHT){
@@ -188,6 +186,7 @@ public class Sketch extends PApplet {
           fltplayerX-= 10;
         }
         
+        // Collision detection
         if(fltplayerX >= 600){
           fltplayerX = 600;
         }
@@ -195,17 +194,24 @@ public class Sketch extends PApplet {
           fltplayerX = 0;
         }
       }
+
+      // Falling kirby and block
+      fill(230, 152, 9);
+      rect(fltplayerX, fltplayerY, 100, 25);
+      image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
+
+      fltkirbyFallingX += 3;
+      fltkirbyFallingY += 3;
     
     // When kirby hits the rectangle, boolKirbySpawn is true
     if(fltkirbyFallingX > fltplayerX && fltkirbyFallingX < fltplayerX + 100 && fltkirbyFallingY >= 480 && blnKirbySpawn == false && blnPlayerAlive == false){
-      //System.out.println("It worked");
       blnKirbySpawn = true;
       blnPlayerAlive = true;
     }
 
+
     // Kirby spawns on the rectangle
     if(blnKirbySpawn == true && blnPlayerAlive == true){
-      //System.out.println("KIRBYYYYYYYYYYYYYYYYYY");
       image(imgKirbyEating, fltplayerX + 18, fltplayerY - 42);
       fltkirbyFallingX += 700;
       fltkirbyFallingY += 700;
@@ -218,10 +224,9 @@ public class Sketch extends PApplet {
 
     }
 
-    // When a circle collides with Kirby, the score goes up by one and the circle respawns at height 0 and a random width
+    // When a candy collides with Kirby, the score goes up by one and the candy respawns at height 0 and a random width
     for(int count = 0; count < candyY.length; count++){
       if(candyY[count] >= fltplayerY - 25 && candyX[count] > fltplayerX - 30 && candyX[count] < fltplayerX + 100 && blnKirbySpawn == true && blnPlayerAlive == true){
-       // System.out.println("Hit!");
         candyY[count] = 0;
         candyX[count] = random(width);
         intScore++; 
@@ -238,65 +243,42 @@ public class Sketch extends PApplet {
       }
     }
 
-    // Drops Gold Coin 
-    if(intScore > fltMustHitScore && blnKirbySpawn == true && blnPlayerAlive == true){
+    // Drops Gold Coin every 15 points and if the player hits the coin, they gain 5 extra points
+    if(intScore > intMustHitScore && blnKirbySpawn == true && blnPlayerAlive == true){
       for(int count = 0; count < 1; count++){
         image(imgCoin, mustHitX[count], mustHitY[count]);
         mustHitY[count]+= fltMustHitSpeed;
         if(mustHitY[count] > fltplayerY - 25 && mustHitX[count] > fltplayerX && mustHitX[count] < fltplayerX + 100){
           intScore = mustHit(intScore);
-          fltMustHitScore += 10;
-          //System.out.println("HIT");
+          intMustHitScore += 15;
           mustHitX[count] = random(width);
           mustHitY[count] = 0;
           fltMustHitSpeed++;
         }
+        // When the player misses the gold coin, they lose a life and the gold coin respawns back to the top awaiting another multiple of 15 to pass
         else if(mustHitY[count] > 550){
           mustHitX[count] = random(width);
           mustHitY[count] = 0;
           intLives--;
         }
       }
-
     }
+       
+    // Displays Score at top left of screen
+      textSize(40);
+      fill(255, 255, 255);
+      text(intScore, 20, 50);
 
+    // When the user has 3 lives, it displays 3 hearts at the top right
     if(intLives == 3){
       image(imgLives, fltlives1X, fltlives1Y);
       image(imgLives, fltlives2X, fltlives2Y);
       image(imgLives, fltlives3X, fltlives3Y);
     }
 
-    textSize(40);
-    fill(255, 255, 255);
-    text(intScore, 550, 100);
 
-
-    fill(230, 152, 9);
-    rect(fltplayerX, fltplayerY, 100, 25);
-    image(imgKirbyFalling, fltkirbyFallingX, fltkirbyFallingY);
-
-    if(intLives == 0){
-
-      blnPlayerAlive = false;
-      fill(0);
-      fltlives1X = 1000;
-      fltlives1X = 1000;
-      fill(0);
-      image(imgGameOver, 0, 0);
-      textSize(40);
-      fill(255, 255, 255);
-      text("Final Score: " + intScore, 223, 100);
-      image(imgPlayAgain, intPlayAgainX, intPlayAgainY);
-      textSize(20);
-      text("High Score: " + + intHighScore.get(0), 0, 20);
-      /*
-      text("High Score 2: " + + intHighScore.get(1), 0, 50);
-      System.out.println(intHighScore2);
-      text("High Score 3: " + + intHighScore.get(2), 0, 80);
-      */
-    }
-
-    else if(intLives == 2){
+    // When the user has 2 lives, it displays 2 hearts at the top right and removes the third
+    if(intLives == 2){
       fltlives3X = 1000;
       fltlives3Y = 1000;
       image(imgLives, fltlives1X, fltlives1Y);
@@ -304,6 +286,7 @@ public class Sketch extends PApplet {
       image(imgLives, fltlives3X, fltlives3Y);
     }
     
+    // When the user has 1 life, it displays 1 heart at the top right and removes the second and third
     else if(intLives == 1){
       fltlives2X = 1000;
       fltlives2Y = 1000;
@@ -313,61 +296,82 @@ public class Sketch extends PApplet {
     }
 
 
+    // When the user has 0 lives, the game over sign appears
+    else if(intLives == 0){
+      blnPlayerAlive = false;
 
-    if(intScore > intHighScore1){
-      intHighScore1 = intScore;
-      intHighScore.set(0, intHighScore1);
-      //System.out.println("Index 1:" + intHighScore.get(0));
+      fltlives1X = 1000;
+      fltlives1X = 1000;
+
+      // Game over screen
+      image(imgGameOver, 0, 0);
+      textSize(40);
+      fill(255, 255, 255);
+
+      // Prints out final game score
+      text("Final Score: " + intScore, 223, 100);
+      image(imgPlayAgain, intPlayAgainX, intPlayAgainY);
+      textSize(20);
+
+      // Prints out high score
+      text("High Score: " + + intHighScore.get(0), 0, 20);
     }
 
-    /*
-    else if(intScore < intHighScore1 && intScore > intHighScore2 && intScore > intHighScore3){
-      intHighScore2 = intScore;
-      //int intHighScore2Difference = intHighScore1 - intHighScore2;
-      //intHighScore2 = intHighScore2 + intHighScore2Difference;
-      System.out.println(intHighScore2);
-      intHighScore.set(1, intHighScore2);
-      System.out.println("Index 2:" + intHighScore.get(1));
-    }
+      // If the user beats their previous high score, the new high score is stored in a arraylist.
+      if(intScore > intHighScore1){
+        intHighScore1 = intScore;
+        intHighScore.set(0, intHighScore1);
+        }
 
-    else if(intScore > intHighScore3 && intScore < intHighScore1 && intScore < intHighScore3){
-      intHighScore3 = intScore;
-      intHighScore.add(2, intScore);
-      System.out.println("Index 3:" + intHighScore.get(3));
-    }
-    */
 
-    //System.out.println(intScore);
   }
 
   // define other methods down here.
 
+  /**
+   * A method that adds 5 to the score count
+   * @param intScore Uses this variable to add 5 points
+   * @return The new score after adding 5
+   */
   public int mustHit(int intScore){
     intScore += 5;
     return intScore;
 
   }
 
+  /**
+   * If the player chooses to restart the game by pressing the "Play Again button" all of the variables will reset and the game will start from the beginning
+   */
   public void mouseClicked(){
     if(intLives == 0){
       if(mouseX < intPlayAgainX + 175 && mouseX > intPlayAgainX && mouseY < intPlayAgainY + 75 && mouseY > intPlayAgainY){
-        System.out.println("PRESSED");
         blnPlayerAlive = false;
         blnKirbySpawn = false;
+
+        // Resets the score and player lives
         intScore = 0;
         intLives = 3;
+
+        // Resets the number that is must hit in order for the gold coin to spawn
+        intMustHitScore = 14;
+        
+        // Resets heart positions
         fltlives1X = 625;
         fltlives1Y = 0;
         fltlives2X = 575;
         fltlives2Y = 0;
         fltlives3X = 525;
         fltlives3Y = 0;
+
+        // Resets the speed for the bad circles
         fltbadcircleYMovement = 5;
+
+        // Resets the beginning phase of Kirby falling
         fltkirbyFallingX = 0;
         fltkirbyFallingY = 0;
-        fltMustHitScore = 10;
+
+        // Resets golden coin speed
         fltMustHitSpeed = 1;
-        //blnStopSpeed = false;
       }
 
     }
